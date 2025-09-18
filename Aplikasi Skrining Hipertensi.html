@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skrining Hipertensi V12</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .status-box {
+            display: inline-block;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            color: #fff;
+            margin-top: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-rendah { background-color: #3498db; }
+        .status-normal { background-color: #2ecc71; }
+        .status-pre { background-color: #f1c40f; }
+        .status-hipertensi { background-color: #e74c3c; }
+        .status-kurus { background-color: #3498db; }
+        .status-gemuk { background-color: #e74c3c; }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+<div class="container bg-white p-8 rounded-xl shadow-lg">
+    <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">Skrining Hipertensi</h2>
+
+    <!-- Input Pengguna -->
+    <div class="space-y-4">
+        <div>
+            <label for="name" class="block text-sm font-medium text-gray-700">Nama:</label>
+            <input type="text" id="name" placeholder="Nama Anda" class="mt-1 block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 transition duration-150">
+        </div>
+        <div>
+            <label for="age" class="block text-sm font-medium text-gray-700">Usia:</label>
+            <input type="number" id="age" placeholder="Usia Anda" class="mt-1 block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 transition duration-150">
+        </div>
+        <div>
+            <label for="gender" class="block text-sm font-medium text-gray-700">Jenis Kelamin:</label>
+            <select id="gender" class="mt-1 block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 transition duration-150">
+                <option value="Laki-laki">Laki-laki</option>
+                <option value="Perempuan">Perempuan</option>
+            </select>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label for="bb" class="block text-sm font-medium text-gray-700">Berat Badan (kg):</label>
+                <input type="number" id="bb" placeholder="Contoh: 65" class="mt-1 block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 transition duration-150">
+            </div>
+            <div>
+                <label for="tb" class="block text-sm font-medium text-gray-700">Tinggi Badan (cm):</label>
+                <input type="number" id="tb" placeholder="Contoh: 168" class="mt-1 block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 transition duration-150">
+            </div>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Tekanan Darah (mmHg):</label>
+            <div class="grid grid-cols-2 gap-4 mt-1">
+                <input type="number" id="systole" placeholder="Sistole (atas)" class="block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 transition duration-150">
+                <input type="number" id="diastole" placeholder="Diastole (bawah)" class="block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 transition duration-150">
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tombol Skrining -->
+    <button onclick="checkData()" class="mt-6 w-full px-6 py-3 bg-green-500 text-white font-bold rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-150">Skrining Sekarang!</button>
+
+    <!-- Hasil Skrining -->
+    <div id="result-section" class="mt-8 pt-6 border-t border-gray-200" style="display:none;">
+        <h3 class="text-2xl font-semibold text-center text-gray-800 mb-4">Hasil Skrining dan Anjuran</h3>
+        <div id="result-display" class="bg-gray-50 p-6 rounded-lg"></div>
+    </div>
+    
+    <!-- Bagian Poster -->
+    <div class="poster-section mt-8 pt-6 border-t border-gray-200 text-center">
+        <h3 class="text-2xl font-semibold text-gray-800 mb-4">Informasi Tambahan</h3>
+        <p id="poster-info" class="text-gray-600">Silakan letakkan gambar poster hipertensi Anda di sini.</p>
+        <img id="myPoster" src="" alt="Poster Hipertensi" class="mt-4 mx-auto rounded-lg shadow-md" style="display:none;">
+    </div>
+
+    <!-- Copyright -->
+    <div class="text-center text-sm text-gray-500 mt-8 pt-4 border-t border-gray-200">
+        Dibuat oleh Dokter Muda FK UII 2025
+    </div>
+</div>
+
+<script>
+    function checkData() {
+        const name = document.getElementById('name').value;
+        const age = document.getElementById('age').value;
+        const gender = document.getElementById('gender').value;
+        const bb = parseFloat(document.getElementById('bb').value);
+        const tb = parseFloat(document.getElementById('tb').value);
+        const systole = parseInt(document.getElementById('systole').value);
+        const diastole = parseInt(document.getElementById('diastole').value);
+    
+        if (isNaN(systole) || isNaN(diastole) || systole <= 0 || diastole <= 0) {
+            document.getElementById('result-display').innerHTML = 'Mohon masukkan nilai sistole dan diastole yang valid.';
+            document.getElementById('result-section').style.display = 'block';
+            return;
+        }
+
+        // Klasifikasi Tekanan Darah: Normal dan Hipertensi saja
+        let status = '';
+        let statusClass = '';
+        if (systole >= 140 || diastole >= 90) {
+            status = 'Hipertensi';
+            statusClass = 'status-hipertensi';
+        } else {
+            status = 'Normal';
+            statusClass = 'status-normal';
+        }
+
+        // Klasifikasi IMT Kemenkes RI
+        let imtStatus = '';
+        let imtClass = '';
+        let imt = null;
+        if (!isNaN(bb) && !isNaN(tb) && tb > 0) {
+            const tb_meter = tb / 100;
+            imt = bb / (tb_meter * tb_meter);
+            if (imt < 17) {
+                imtStatus = 'Kurus (Kekurangan berat badan tingkat berat)';
+                imtClass = 'status-kurus';
+            } else if (imt >= 17 && imt < 18.5) {
+                imtStatus = 'Kurus (Kekurangan berat badan tingkat ringan)';
+                imtClass = 'status-kurus';
+            } else if (imt >= 18.5 && imt < 25) {
+                imtStatus = 'Normal';
+                imtClass = 'status-normal';
+            } else if (imt >= 25 && imt < 27) {
+                imtStatus = 'Gemuk (Kelebihan berat badan tingkat ringan)';
+                imtClass = 'status-gemuk';
+            } else {
+                imtStatus = 'Gemuk (Kelebihan berat badan tingkat berat)';
+                imtClass = 'status-gemuk';
+            }
+        } else {
+            imtStatus = 'Data tidak lengkap untuk menghitung IMT.';
+            imtClass = '';
+        }
+
+        // Fungsi untuk membuat anjuran gaya hidup dinamis
+        function getAnjuran(status, imtStatus) {
+            let anjuranList = [];
+
+            // Anjuran Umum
+            anjuranList.push('Batasi jumlah garam (kurang dari 1 sendok teh per hari).');
+            anjuranList.push('Konsumsi makanan bergizi seimbang (perbanyak buah, sayur, dan protein tanpa lemak).');
+            anjuranList.push('Kelola stres dengan baik, misalnya dengan meditasi atau hobi.');
+
+            // Anjuran Berdasarkan Tekanan Darah
+            if (status === 'Hipertensi') {
+                anjuranList.push('Kurangi konsumsi kafein dan alkohol.');
+                anjuranList.push('Hentikan kebiasaan merokok.');
+                anjuranList.push('Periksa ke Puskesmas terdekat untuk konsultasi dengan dokter.');
+            }
+
+            // Anjuran Berdasarkan IMT
+            if (imtStatus.includes('Gemuk')) {
+                anjuranList.push('Aktivitas fisik minimal 30 menit setiap hari, seperti jalan santai, bersepeda, atau senam ringan.');
+                anjuranList.push('Kontrol berat badan agar tetap ideal.');
+            } else if (imtStatus.includes('Kurus')) {
+                anjuranList.push('Konsumsi makanan tinggi kalori dan protein secara sehat.');
+                anjuranList.push('Meningkatkan porsi makan secara bertahap.');
+            }
+            
+            // Format menjadi HTML dengan bullet point
+            let htmlList = anjuranList.map(item => `<li>${item}</li>`).join('');
+            return `<ul class="list-disc list-inside">${htmlList}</ul>`;
+        }
+
+        const anjuran = getAnjuran(status, imtStatus);
+        
+        const resultText = `
+<h4 class="font-bold text-lg text-black mb-3">Informasi Pribadi</h4>
+<p>Nama: ${name || '-'}</p>
+<p>Usia: ${age || '-'}</p>
+<p>Jenis Kelamin: ${gender}</p>
+
+<h4>Hasil Skrining</h4>
+<div class="font-bold text-lg text-black mb-3">Tekanan Darah Anda: ${systole}/${diastole} mmHg</div>
+
+<p><b>Status Tekanan Darah:</b> <span class="status-box ${statusClass}">${status}</span></p>
+<p class="mt-2"><b>Status IMT:</b> <span class="status-box ${imtClass}">${imtStatus}</span></p>
+
+<h4 class="mt-4 font-bold text-black">Anjuran Modifikasi Gaya Hidup</h4>
+${anjuran}
+
+<p class="mt-4">Untuk hasil yang lebih akurat dan penanganan lebih lanjut, <b>periksa ke Puskesmas</b> terdekat untuk konsultasi dengan dokter. Silakan lihat poster untuk informasi tambahan mengenai hipertensi. <b>Hidup Sehat tanpa Hipertensi!</b></p>
+        `;
+    
+        document.getElementById('result-display').innerHTML = resultText;
+        document.getElementById('result-section').style.display = 'block';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const posterUrl = ''; /file:///C:/Users/Acer/AppData/Local/Temp/41779603-91c1-4a6d-b950-9d4cc7f55384_POSTER%20HT%20(pdf.io).zip.384/POSTER-HT.html/
+        const posterImg = document.getElementById('myPoster');
+        const posterInfo = document.getElementById('poster-info');
+    
+        if (posterUrl) {
+            posterImg.src = posterUrl;
+            posterImg.onload = () => {
+                posterImg.style.display = 'block';
+                posterInfo.style.display = 'none';
+            };
+            posterImg.onerror = () => {
+                posterInfo.innerText = 'Gambar poster tidak dapat dimuat. Pastikan URL benar.';
+            };
+        }
+    });
+</script>
+
+</body>
+</html>
